@@ -24,8 +24,9 @@ public class PlayerManager : MonoBehaviour
     private bool isRun;
 
     //공격
-    private bool input_Attack;
+    private bool input_attack;
     private int attackCount;
+
     #endregion
 
     void Awake()
@@ -45,20 +46,21 @@ public class PlayerManager : MonoBehaviour
         jumpPower = 15;
 
         //공격
+        input_attack = false;
         attackCount = 0;
     }
 
     void Update()
     {
         InputSystem();
-        
+        Attack();
     }
 
     void FixedUpdate()
     {
         Move();
         Jump();
-        Attack();
+        
     }
 
     #region 함수
@@ -66,7 +68,7 @@ public class PlayerManager : MonoBehaviour
     {
         input_x = Input.GetAxis("Horizontal");
         input_jump = Input.GetAxis("Jump");
-        input_Attack = Input.GetKey(KeyCode.F);
+        input_attack = Input.GetKeyDown(KeyCode.F);
     }
 
     void Move()
@@ -108,26 +110,34 @@ public class PlayerManager : MonoBehaviour
 
     void Attack()
     {
-        if (input_Attack)
+        if (Input.GetKeyDown(KeyCode.F))
+        {
             attackCount++;
-        else if (attackCount == 4)
-            attackCount = 1;
+            StartCoroutine(AttackAnim());
+        }
+            
+    }
 
-        switch(attackCount)
+    IEnumerator AttackAnim()
+    {
+        switch (attackCount)
         {
             case 1:
-                anim.SetInteger("isAttack", 1);
+                anim.SetInteger("attackCount", 1);
                 break;
             case 2:
-                anim.SetInteger("isAttack", 2);
+                anim.SetInteger("attackCount", 2);
                 break;
             case 3:
-                anim.SetInteger("isAttack", 3);
+                anim.SetInteger("attackCount", 3);
                 break;
         }
 
+        yield return null;
+        anim.SetInteger("attackCount", 0);
 
-        
+        yield return new WaitForSeconds(2f);
+        attackCount = 0;
     }
 
     #endregion
